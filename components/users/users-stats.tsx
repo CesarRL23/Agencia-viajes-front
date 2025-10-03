@@ -1,37 +1,68 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserCheck, UserX, Shield } from "lucide-react"
+import { getUsers } from "@/services/userService"
+import type { User } from "@/services/userService"
 
 export function UsersStats() {
-  const stats = [
+  const [stats, setStats] = useState({
+    total: 0,
+    active: 0,
+    inactive: 0,
+    admins: 0
+  })
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const users = await getUsers()
+        
+        setStats({
+          total: users.length,
+          active: users.filter(user => user.status === 'active').length || users.length, // asumiendo que todos son activos si no hay status
+          inactive: users.filter(user => user.status === 'inactive').length || 0,
+          admins: users.filter(user => user.role === 'admin').length || 0
+        })
+      } catch (error) {
+        console.error('Error al cargar estadísticas:', error)
+      }
+    }
+
+    loadStats()
+  }, [])
+
+  const statsData = [
     {
       title: "Total Usuarios",
-      value: "156",
-      description: "+12 este mes",
+      value: stats.total.toString(),
+      description: `${stats.total} usuarios registrados`,
       icon: Users,
     },
     {
       title: "Usuarios Activos",
-      value: "142",
-      description: "91% del total",
+      value: stats.active.toString(),
+      description: `${((stats.active / stats.total) * 100).toFixed(1)}% del total`,
       icon: UserCheck,
     },
     {
       title: "Usuarios Inactivos",
-      value: "14",
-      description: "9% del total",
+      value: stats.inactive.toString(),
+      description: `${((stats.inactive / stats.total) * 100).toFixed(1)}% del total`,
       icon: UserX,
     },
     {
       title: "Administradores",
-      value: "8",
-      description: "5% del total",
+      value: stats.admins.toString(),
+      description: `${((stats.admins / stats.total) * 100).toFixed(1)}% del total`,
       icon: Shield,
     },
   ]
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
+      {statsData.map((stat) => (
         <Card key={stat.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
