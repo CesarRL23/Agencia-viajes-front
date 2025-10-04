@@ -22,4 +22,25 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem('firebaseToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expirado o inválido
+      localStorage.removeItem('firebaseToken');
+      localStorage.removeItem('user');
+      window.location.href = '/auth/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default axiosInstance;

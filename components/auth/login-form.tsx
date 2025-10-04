@@ -1,22 +1,58 @@
-"use client"
-
-import type React from "react"
+'use client'
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, Mail, Lock, Chrome, Github } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link"
+import { loginWithProvider } from "@/services/authService"
 
 export function LoginForm() {
+  const router = useRouter()
+  const { toast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
+
+  const handleSocialLogin = async (provider: string) => {
+    try {
+      setIsLoading(true)
+      const userData = await loginWithProvider(provider)
+
+      if (!userData) {
+        throw new Error("No se pudo obtener la información del usuario")
+      }
+
+      toast({
+        title: "Inicio de sesión exitoso",
+        description: `Bienvenido ${userData.name}!`,
+        duration: 3000,
+      })
+
+      router.replace("/dashboard")
+    } catch (error: any) {
+      console.error("Error de login:", error)
+
+      toast({
+        variant: "destructive",
+        title: "Error al iniciar sesión",
+        description: error.message || "Hubo un problema al intentar iniciar sesión",
+        duration: 5000,
+      })
+
+      localStorage.removeItem("firebaseToken")
+      localStorage.removeItem("user")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -28,11 +64,6 @@ export function LoginForm() {
       // Redirect to dashboard
       window.location.href = "/dashboard"
     }, 2000)
-  }
-
-  const handleSocialLogin = (provider: string) => {
-    console.log(`Login with ${provider}`)
-    // Implement Firebase Auth integration
   }
 
   return (
@@ -104,16 +135,34 @@ export function LoginForm() {
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <Button variant="outline" onClick={() => handleSocialLogin("google")} className="w-full">
+        <Button
+          variant="outline"
+          onClick={() => handleSocialLogin("google")}
+          className="w-full"
+          disabled={isLoading}
+        >
           <Chrome className="h-4 w-4" />
         </Button>
-        <Button variant="outline" onClick={() => handleSocialLogin("microsoft")} className="w-full">
+        <Button
+          variant="outline"
+          onClick={() => handleSocialLogin("microsoft")}
+          className="w-full"
+          disabled={isLoading}
+        >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
             <path d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z" />
           </svg>
         </Button>
-        <Button variant="outline" onClick={() => handleSocialLogin("github")} className="w-full">
+        <Button
+          variant="outline"
+          onClick={() => handleSocialLogin("github")}
+          className="w-full flex items-center justify-center gap-2"
+          disabled={isLoading}
+        >
           <Github className="h-4 w-4" />
+          {isLoading && "github" && (
+            <span className="loading loading-spinner loading-xs"></span>
+          )}
         </Button>
       </div>
 
