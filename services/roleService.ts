@@ -18,7 +18,7 @@ export const getRoles = async (): Promise<Role[]> => {
 
 export const assignRole = async (userId: string, roleId: string): Promise<void> => {
   try {
-    await axiosInstance.post(`/api/users/${userId}/role`, { roleId });
+    await axiosInstance.post(`/api/user-role/user/${userId}/role/${roleId}`);
   } catch (error) {
     console.error('Error al asignar rol:', error);
     throw new Error('No se pudo asignar el rol al usuario');
