@@ -10,16 +10,15 @@ import { Eye, EyeOff, Mail, Lock, Chrome, Github } from "lucide-react"
 import { useToast } from "@/components/users/ui/use-toast"
 import Link from "next/link"
 import { loginWithProvider, loginWithEmail } from "@/services/authService"
+import ReCAPTCHA from "react-google-recaptcha"
 
 export function LoginForm() {
   const router = useRouter()
   const { toast } = useToast()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  })
+  const [formData, setFormData] = useState({ email: "", password: "" })
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null)
 
   // 🟢 Login con Google / GitHub / Microsoft (Firebase)
   const handleSocialLogin = async (provider: string) => {
@@ -56,8 +55,17 @@ export function LoginForm() {
   // 🧠 Login con correo y contraseña (flujo backend)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
 
+    if (!recaptchaToken) {
+      toast({
+        variant: "destructive",
+        title: "Captcha requerido",
+        description: "Por favor valida que no eres un robot",
+      })
+      return
+    }
+
+    setIsLoading(true)
     try {
       const res = await loginWithEmail(formData.email, formData.password)
 
@@ -66,8 +74,6 @@ export function LoginForm() {
           title: "Código enviado",
           description: "Revisa tu correo y verifica el código de autenticación.",
         })
-
-        // Redirigir a página de verificación 2FA
         router.push(`/auth/verify-2fa?email=${formData.email}&sessionId=${res.sessionId}`)
       }
     } catch (err: any) {
@@ -84,6 +90,7 @@ export function LoginForm() {
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Email */}
         <div className="space-y-2">
           <Label htmlFor="email">Correo Electrónico</Label>
           <div className="relative">
@@ -100,6 +107,7 @@ export function LoginForm() {
           </div>
         </div>
 
+        {/* Password */}
         <div className="space-y-2">
           <Label htmlFor="password">Contraseña</Label>
           <div className="relative">
@@ -129,6 +137,14 @@ export function LoginForm() {
           </div>
         </div>
 
+        {/* reCAPTCHA */}
+        <div className="flex justify-center">
+          <ReCAPTCHA
+            sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY as string}
+            onChange={(token) => setRecaptchaToken(token)}
+          />
+        </div>
+
         <div className="flex items-center justify-between">
           <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
             ¿Olvidaste tu contraseña?
@@ -140,6 +156,7 @@ export function LoginForm() {
         </Button>
       </form>
 
+      {/* Separador social login */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <Separator className="w-full" />
@@ -149,6 +166,7 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* Social buttons */}
       <div className="grid grid-cols-3 gap-3">
         <Button
           variant="outline"
