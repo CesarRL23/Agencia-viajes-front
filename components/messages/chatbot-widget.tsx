@@ -1,11 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
+import { Button } from "@/components/users/ui/button"
+import { Input } from "@/components/users/ui/input"
+import { ScrollArea } from "@/components/users/ui/scroll-area"
+import { Avatar, AvatarFallback } from "@/components/users/ui/avatar"
 import { Bot, Send, X, Minimize2 } from "lucide-react"
 
 interface ChatbotMessage {

@@ -3,9 +3,9 @@
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { validate2FA } from '@/services/authService';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/users/ui/button';
+import { Input } from '@/components/users/ui/input';
+import { useToast } from '@/components/users/ui/use-toast';
 
 export default function Verify2FA() {
   const [code, setCode] = useState('');

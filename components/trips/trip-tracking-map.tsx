@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
 import { MapPin, Navigation } from "lucide-react"
 
 interface TripTrackingMapProps {

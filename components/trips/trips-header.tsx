@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/users/ui/button"
 import { Plus, Map, Calendar } from "lucide-react"
 import { useState } from "react"
 import { CreateTripDialog } from "./create-trip-dialog"

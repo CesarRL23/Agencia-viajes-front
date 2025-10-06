@@ -1,9 +1,9 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
+import { Button } from "@/components/users/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/users/ui/avatar"
+import { Badge } from "@/components/users/ui/badge"
 import { Plus, Phone, Mail } from "lucide-react"
 
 interface TripParticipantsProps {

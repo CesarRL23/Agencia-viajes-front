@@ -10,13 +10,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/users/ui/dialog"
+import { Button } from "@/components/users/ui/button"
+import { Input } from "@/components/users/ui/input"
+import { Label } from "@/components/users/ui/label"
+import { Textarea } from "@/components/users/ui/textarea"
+import { Checkbox } from "@/components/users/ui/checkbox"
+import { Badge } from "@/components/users/ui/badge"
 
 interface CreateRoleDialogProps {
   open: boolean

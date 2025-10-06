@@ -1,8 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
+import { Button } from "@/components/users/ui/button"
+import { Badge } from "@/components/users/ui/badge"
 import { Plus, MapPin, Plane, Car, Clock } from "lucide-react"
 import { useState } from "react"
 

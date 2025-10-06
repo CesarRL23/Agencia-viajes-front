@@ -7,10 +7,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/users/ui/dialog"
+import { Input } from "@/components/users/ui/input"
+import { Button } from "@/components/users/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/users/ui/avatar"
 import { Search, User } from "lucide-react"
 import { User as UserType } from "@/services/userService"
 

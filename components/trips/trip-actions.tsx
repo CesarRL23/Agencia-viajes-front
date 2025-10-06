@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/users/ui/button"
 import { ArrowLeft, Edit, MapPin, MessageSquare, Share } from "lucide-react"
 
 interface TripActionsProps {
