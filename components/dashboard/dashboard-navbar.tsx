@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/users/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,12 +8,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "@/components/users/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/users/ui/avatar"
 import { Bell, Search, User, LogOut, Settings } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/users/ui/input"
 import { NotificationCenter } from "@/components/notifications/notification-center"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/users/ui/popover"
 
 export function DashboardNavbar() {
   const handleLogout = () => {

@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/users/ui/button"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,15 +8,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/users/ui/dropdown-menu"
-import { MoreHorizontal, Edit, Trash2 } from "lucide-react"
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal, Edit, Trash2, Shield } from "lucide-react"
 
-interface UserActionsMenuProps {
+interface RoleActionsMenuProps {
   onEdit: () => void
   onDelete: () => void
+  onPermissions: () => void
 }
 
-export default function UserActionsMenu({ onEdit, onDelete }: UserActionsMenuProps) {
+export default function RoleActionsMenu({ onEdit, onDelete, onPermissions }: RoleActionsMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,7 +31,11 @@ export default function UserActionsMenu({ onEdit, onDelete }: UserActionsMenuPro
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onEdit} className="cursor-pointer">
           <Edit className="mr-2 h-4 w-4" />
-          Actualizar
+          Editar
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onPermissions} className="cursor-pointer">
+          <Shield className="mr-2 h-4 w-4" />
+          Permisos
         </DropdownMenuItem>
         <DropdownMenuItem onClick={onDelete} className="cursor-pointer text-destructive focus:text-destructive">
           <Trash2 className="mr-2 h-4 w-4" />

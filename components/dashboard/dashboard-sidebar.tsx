@@ -4,8 +4,8 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Button } from "@/components/users/ui/button"
+import { ScrollArea } from "@/components/users/ui/scroll-area"
 import {
   LayoutDashboard,
   Users,
@@ -31,6 +31,11 @@ const navigation = [
   {
     name: "Usuarios",
     href: "/dashboard/users",
+    icon: Users,
+  },
+  {
+    name: "Roles",
+    href: "/dashboard/users/roles",
     icon: Users,
   },
   {

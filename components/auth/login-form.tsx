@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { Button } from "@/components/users/ui/button"
+import { Input } from "@/components/users/ui/input"
+import { Label } from "@/components/users/ui/label"
+import { Separator } from "@/components/users/ui/separator"
 import { Eye, EyeOff, Mail, Lock, Chrome, Github } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { useToast } from "@/components/users/ui/use-toast"
 import Link from "next/link"
 import { loginWithProvider, loginWithEmail } from "@/services/authService"
 

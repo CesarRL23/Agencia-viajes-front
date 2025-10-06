@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
 import { Users, UserCheck, UserX, Shield } from "lucide-react"
 import { getUsers, type User } from "@/services/userService"
 

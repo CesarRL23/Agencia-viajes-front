@@ -1,10 +1,13 @@
 // frontend/services/userService.ts
 import axiosInstance from "@/utils/axiosInstance";
+import { count } from "console";
 
 
 const API_URL = "/api/users"; // Actualizado para coincidir con el backend
 
 export interface User {
+  role: string;
+  active: boolean;
   _id?: string;
   name: string;
   email: string;
@@ -81,4 +84,27 @@ export const matchSession = async (userId: string, sessionId: string): Promise<v
     console.error(`Error al vincular el usuario con ID ${userId} a la sesión ${sessionId}:`, error);
     throw new Error(`No se pudo vincular el usuario a la sesión`);
   }
+
+  
 };
+
+export const updateUserRole = async (userId: string, newRole: string) => {
+  try {
+    const response = await fetch(`/api/users/${userId}/role`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ role: newRole }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Error al actualizar el rol del usuario')
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Error:', error)
+    throw error
+  }
+}

@@ -1,8 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
+import { Badge } from "@/components/users/ui/badge"
+import { Button } from "@/components/users/ui/button"
 import { Car, Bolt as Boat, Plane, MapPin, Clock, Phone } from "lucide-react"
 
 interface VehicleStatusProps {

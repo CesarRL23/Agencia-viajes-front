@@ -10,14 +10,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+} from "@/components/users/ui/dialog"
+import { Button } from "@/components/users/ui/button"
+import { Input } from "@/components/users/ui/input"
+import { Label } from "@/components/users//ui/label"
+import { Textarea } from "@/components/users//ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/users//ui/select"
+import { Calendar } from "@/components/users//ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/users//ui/popover"
 import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"

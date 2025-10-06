@@ -1,7 +1,7 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
+import { Badge } from "@/components/users/ui/badge"
 import { MapPin, Calendar, Users, DollarSign, User } from "lucide-react"
 
 interface TripDetailsProps {
