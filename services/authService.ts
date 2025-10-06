@@ -193,3 +193,31 @@ export const getCurrentUser = (): AuthResponse | null => {
   const userStr = localStorage.getItem('user');
   return userStr ? JSON.parse(userStr) : null;
 };
+
+// =========================
+// 📝 Registro de usuario (flujo backend)
+// =========================
+
+interface RegisterResponse {
+  _id: string;
+  name: string;
+  email: string;
+  message?: string;
+}
+
+export const registerUser = async (userData: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<RegisterResponse> => {
+  try {
+    const response = await axiosInstance.post<RegisterResponse>(
+      '/api/users',
+      userData
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en registro:', error);
+    throw new Error(error.response?.data?.message || 'Error al crear la cuenta');
+  }
+};

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserCheck, UserX, Shield } from "lucide-react"
-import { getUsers } from "@/services/userService"
+import { getUsers, type User } from "@/services/userService"
 
 export function UsersStats() {
   const [stats, setStats] = useState({
@@ -17,6 +17,14 @@ export function UsersStats() {
     const loadStats = async () => {
       try {
         const users = await getUsers()
+
+        // Aquí puedes ajustar según tu modelo
+        const total = users.length
+        const active = users.filter(u => u.active === true).length || 0
+        const admins = users.filter(u => u.role === "ADMIN").length || 0
+        const inactive = total - active
+
+        setStats({ total, active, inactive, admins })
       } catch (error) {
         console.error("Error al cargar estadísticas:", error)
       }
@@ -24,6 +32,9 @@ export function UsersStats() {
 
     loadStats()
   }, [])
+
+  const getPercentage = (value: number) =>
+    stats.total > 0 ? ((value / stats.total) * 100).toFixed(1) : "0.0"
 
   const statsData = [
     {
@@ -35,19 +46,19 @@ export function UsersStats() {
     {
       title: "Usuarios Activos",
       value: stats.active.toString(),
-      description: `${((stats.active / stats.total) * 100).toFixed(1)}% del total`,
+      description: `${getPercentage(stats.active)}% del total`,
       icon: UserCheck,
     },
     {
       title: "Usuarios Inactivos",
       value: stats.inactive.toString(),
-      description: `${((stats.inactive / stats.total) * 100).toFixed(1)}% del total`,
+      description: `${getPercentage(stats.inactive)}% del total`,
       icon: UserX,
     },
     {
       title: "Administradores",
       value: stats.admins.toString(),
-      description: `${((stats.admins / stats.total) * 100).toFixed(1)}% del total`,
+      description: `${getPercentage(stats.admins)}% del total`,
       icon: Shield,
     },
   ]
