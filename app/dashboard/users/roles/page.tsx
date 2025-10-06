@@ -10,7 +10,7 @@ interface User {
 }
 
 interface Role {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -23,10 +23,11 @@ export default function RolesPage() {
   >([]);
 
   const roles: Role[] = [
-    { id: 1, name: "Administrador" },
-    { id: 2, name: "Cliente" },
-    { id: 3, name: "Guía Turístico" },
-  ];
+  { id: "68c32a54748c5b1db0d503bf", name: "Administrador" },
+  { id: "68e4344c08bd244ede55532d", name: "Cliente" },
+  { id: "68e4343b08bd244ede55532c", name: "Guía Turístico" },
+];
+
 
   // ✅ Cargar los usuarios desde el backend
   useEffect(() => {
@@ -93,19 +94,20 @@ export default function RolesPage() {
 
         {/* Select de roles */}
         <Select
-          label="Seleccionar Rol"
-          selectedKeys={selectedRole ? [selectedRole] : []}
-          onSelectionChange={(keys) => setSelectedRole(Array.from(keys)[0] as string)}
-          classNames={{
-            popoverContent: "bg-white shadow-md", // 👈 también fondo blanco aquí
-          }}
-        >
-          {roles.map((role) => (
-            <SelectItem key={role.name} value={role.name}>
-              {role.name}
-            </SelectItem>
-          ))}
+              label="Seleccionar Rol"
+              selectedKeys={selectedRole ? [selectedRole] : []}
+              onSelectionChange={(keys) => setSelectedRole(Array.from(keys)[0] as string)}
+              classNames={{
+                popoverContent: "bg-white shadow-md",
+              }}
+            >
+              {roles.map((role) => (
+                <SelectItem key={role.id} value={role.id}>
+                  {role.name}
+                </SelectItem>
+              ))}
         </Select>
+
       </div>
 
       <button
