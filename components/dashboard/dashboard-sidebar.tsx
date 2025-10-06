@@ -39,6 +39,11 @@ const navigation = [
     icon: Users,
   },
   {
+    name: "Permisos",
+    href: "/dashboard/permissions",
+    icon: Users,
+  },
+  {
     name: "Viajes",
     href: "/dashboard/trips",
     icon: Plane,

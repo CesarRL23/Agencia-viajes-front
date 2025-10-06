@@ -3,9 +3,9 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/users/ui/dialog"
+import { Input } from "@/components/users/ui/input"
+import { Button } from "@/components/users/ui/button"
 import { Search, Shield } from "lucide-react"
 import { getPermissions, type Permission } from "@/services/permissionService"
 

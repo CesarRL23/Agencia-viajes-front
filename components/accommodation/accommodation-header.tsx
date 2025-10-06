@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/users/ui/button"
 import { Plus, Building, Calendar } from "lucide-react"
 import { useState } from "react"
 import { CreateReservationDialog } from "./create-reservation-dialog"

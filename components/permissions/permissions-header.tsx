@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/users/ui/button"
 import { FileSpreadsheet } from "lucide-react"
 
 interface PermissionsHeaderProps {

@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/users/ui/card"
 import { Hotel, Bed, Calendar, DollarSign } from "lucide-react"
 
 export function AccommodationStats() {

@@ -9,11 +9,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/components/users/ui/dialog"
+import { Button } from "@/components/users/ui/button"
+import { Input } from "@/components/users/ui/input"
+import { Label } from "@/components/users/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/users/ui/select"
 
 import type { Permission } from "@/services/permissionService"
 
