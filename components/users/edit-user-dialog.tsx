@@ -15,14 +15,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-// 👇 usamos la interfaz desde tu servicio
-import { User } from "@/services/userService"
+import type { User } from "@/services/userService"
 
 interface EditUserDialogProps {
   user: User | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (user: User) => void
+  onSave: (user: User) => Promise<void>
 }
 
 export function EditUserDialog({ user, open, onOpenChange, onSave }: EditUserDialogProps) {
@@ -32,6 +31,8 @@ export function EditUserDialog({ user, open, onOpenChange, onSave }: EditUserDia
     role: "",
     status: "active" as "active" | "inactive",
   })
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const roles = [
     { value: "Administrador", label: "Administrador" },
@@ -46,19 +47,29 @@ export function EditUserDialog({ user, open, onOpenChange, onSave }: EditUserDia
       setFormData({
         name: user.name,
         email: user.email,
-        role: (user as any).role ?? "", // 👈 si tu backend aún no manda role
+        role: (user as any).role ?? "",
         status: (user as any).status ?? "active",
       })
     }
   }, [user])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (user) {
-      onSave({
-        ...user,
-        ...formData,
-      })
+      try {
+        setIsLoading(true)
+        setError("")
+        const updatedUser = {
+          ...user,
+          ...formData,
+        }
+        await onSave(updatedUser)
+        onOpenChange(false)
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Error desconocido")
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -126,11 +137,15 @@ export function EditUserDialog({ user, open, onOpenChange, onSave }: EditUserDia
             </Select>
           </div>
 
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
               Cancelar
             </Button>
-            <Button type="submit">Guardar Cambios</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Guardando..." : "Guardar Cambios"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

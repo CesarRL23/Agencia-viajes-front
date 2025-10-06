@@ -1,11 +1,15 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { FileSpreadsheet } from "lucide-react"
 import { useState } from "react"
-import { CreateUserDialog } from "./create-user-dialog"
+import { CreateUserDialog } from "@/components/users/create-user-dialog"
 
-export function UsersHeader() {
+interface UsersHeaderProps {
+  onExport?: () => void
+}
+
+export function UsersHeader({ onExport }: UsersHeaderProps) {
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
   return (
@@ -15,13 +19,16 @@ export function UsersHeader() {
           <h2 className="text-3xl font-bold tracking-tight">Gestión de Usuarios</h2>
           <p className="text-muted-foreground">Administra usuarios, roles y permisos del sistema</p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nuevo Usuario
-        </Button>
+        <div className="flex space-x-2">
+          {onExport && (
+            <Button variant="outline" onClick={onExport} className="flex items-center space-x-2 bg-transparent">
+              <FileSpreadsheet className="h-4 w-4" />
+              <span>Exportar</span>
+            </Button>
+          )}
+          <CreateUserDialog />
+        </div>
       </div>
-
-      <CreateUserDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
     </>
   )
 }

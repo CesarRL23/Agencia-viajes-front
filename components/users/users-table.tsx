@@ -6,37 +6,114 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Search, Edit, Trash2 } from "lucide-react"
-import { EditUserDialog } from "./edit-user-dialog"
-import { DeleteUserDialog } from "./delete-user-dialog"
-import { CreateUserDialog } from "./create-user-dialog"
-import { deleteUser, User } from "@/services/userService"
-import { useUsers } from '@/contexts/UserContext';
+import { Search, Edit, Trash2 } from "lucide-react"
+import { EditUserDialog } from "@/components/users/edit-user-dialog"
+import { DeleteUserDialog } from "@/components/users/delete-user-dialog"
+import { CreateUserDialog } from "@/components/users/create-user-dialog"
+import { UserSelectionDialog } from "@/components/users/user-selection-dialog"
+import UserActionsMenu from "@/components/users/user-actions-menu"
+import { deleteUser, updateUser, type User } from "@/services/userService"
+import { useUsers } from "@/contexts/UserContext"
+import { useToast } from "@/hooks/use-toast"
 
 export function UsersTable() {
-  const { users, refreshUsers } = useUsers();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [deletingUser, setDeletingUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { users, refreshUsers } = useUsers()
+  const { toast } = useToast()
+  const [searchTerm, setSearchTerm] = useState("")
+  const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [deletingUser, setDeletingUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showUserSelection, setShowUserSelection] = useState(false)
+  const [selectionAction, setSelectionAction] = useState<'edit' | 'delete' | null>(null)
 
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  // Función para manejar la eliminación de usuario
+  const handleDeleteUser = async (user: User) => {
+    if (!user._id) {
+      console.error("No se encontró ID del usuario")
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      console.log("Eliminando usuario:", user)
+      await deleteUser(user._id)
+      await refreshUsers()
+      toast({
+        title: "Usuario eliminado",
+        description: `El usuario ${user.name} ha sido eliminado exitosamente.`,
+      })
+    } catch (error: any) {
+      console.error("Error al eliminar usuario:", error)
+      toast({
+        title: "Error al eliminar",
+        description: error.message || "No se pudo eliminar el usuario. Inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Función para manejar la actualización de usuario
+  const handleUpdateUser = async (updatedUser: User) => {
+    if (!updatedUser._id) {
+      console.error("No se encontró ID del usuario")
+      return
+    }
+
+    try {
+      setIsLoading(true)
+      console.log("Actualizando usuario:", updatedUser)
+      await updateUser(updatedUser._id, updatedUser)
+      await refreshUsers()
+      toast({
+        title: "Usuario actualizado",
+        description: `El usuario ${updatedUser.name} ha sido actualizado exitosamente.`,
+      })
+    } catch (error: any) {
+      console.error("Error al actualizar usuario:", error)
+      toast({
+        title: "Error al actualizar",
+        description: error.message || "No se pudo actualizar el usuario. Inténtalo de nuevo.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Función para abrir el diálogo de selección
+  const handleOpenUserSelection = (action: 'edit' | 'delete') => {
+    setSelectionAction(action)
+    setShowUserSelection(true)
+  }
+
+  // Función para manejar la selección de usuario
+  const handleUserSelected = (user: User) => {
+    if (selectionAction === 'edit') {
+      setEditingUser(user)
+    } else if (selectionAction === 'delete') {
+      setDeletingUser(user)
+    }
+    setSelectionAction(null)
+  }
+
   if (isLoading) {
-    return <div>Cargando usuarios...</div>
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Cargando usuarios...</p>
+        </div>
+      </div>
+    )
   }
 
   if (error) {
@@ -59,6 +136,24 @@ export function UsersTable() {
                   className="pl-10"
                 />
               </div>
+              <Button
+                variant="outline"
+                onClick={() => handleOpenUserSelection('edit')}
+                className="flex items-center space-x-2"
+                disabled={users.length === 0}
+              >
+                <Edit className="h-4 w-4" />
+                <span>Actualizar</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => handleOpenUserSelection('delete')}
+                className="flex items-center space-x-2 text-destructive hover:text-destructive"
+                disabled={users.length === 0}
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>Eliminar</span>
+              </Button>
               <CreateUserDialog />
             </div>
           </div>
@@ -93,28 +188,16 @@ export function UsersTable() {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{"********"}</TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => setEditingUser(user)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => setDeletingUser(user)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Eliminar
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <UserActionsMenu
+                      onEdit={() => {
+                        console.log("Editando usuario:", user)
+                        setEditingUser(user)
+                      }}
+                      onDelete={() => {
+                        console.log("Eliminando usuario:", user)
+                        setDeletingUser(user)
+                      }}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
@@ -126,9 +209,13 @@ export function UsersTable() {
       <EditUserDialog
         user={editingUser}
         open={!!editingUser}
-        onOpenChange={(open) => !open && setEditingUser(null)}
-        onSave={(updatedUser) => {
-          setUsers(users.map((u) => (u._id === updatedUser._id ? updatedUser : u)))
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditingUser(null)
+          }
+        }}
+        onSave={async (updatedUser) => {
+          await handleUpdateUser(updatedUser)
           setEditingUser(null)
         }}
       />
@@ -136,18 +223,31 @@ export function UsersTable() {
       <DeleteUserDialog
         user={deletingUser}
         open={!!deletingUser}
-        onOpenChange={(open) => !open && setDeletingUser(null)}
-        onConfirm={async () => {
-          if (deletingUser) {
-            try {
-              await deleteUser(deletingUser._id!);
-              await refreshUsers(); // Actualizar la lista después de eliminar
-              setDeletingUser(null);
-            } catch (error) {
-              console.error('Error al eliminar usuario:', error);
-            }
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeletingUser(null)
           }
         }}
+        onConfirm={async () => {
+          if (deletingUser) {
+            await handleDeleteUser(deletingUser)
+            setDeletingUser(null)
+          }
+        }}
+      />
+
+      <UserSelectionDialog
+        open={showUserSelection}
+        onOpenChange={setShowUserSelection}
+        onUserSelect={handleUserSelected}
+        users={users}
+        title={selectionAction === 'edit' ? 'Seleccionar Usuario para Editar' : 'Seleccionar Usuario para Eliminar'}
+        description={selectionAction === 'edit' 
+          ? 'Busca y selecciona el usuario que deseas editar.' 
+          : 'Busca y selecciona el usuario que deseas eliminar. Esta acción no se puede deshacer.'
+        }
+        actionButtonText={selectionAction === 'edit' ? 'Editar Usuario' : 'Eliminar Usuario'}
+        actionButtonIcon={selectionAction === 'edit' ? <Edit className="h-4 w-4" /> : <Trash2 className="h-4 w-4" />}
       />
     </>
   )

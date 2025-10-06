@@ -57,6 +57,9 @@ export const loginWithProvider = async (providerName: string): Promise<AuthRespo
         throw new Error('Proveedor no soportado');
     }
 
+    if (!auth) {
+      throw new Error('Firebase Auth no está inicializado');
+    }
     const result = await signInWithPopup(auth, provider);
     const token = await result.user.getIdToken();
 
@@ -117,6 +120,52 @@ export const loginWithProvider = async (providerName: string): Promise<AuthRespo
     throw new Error(error.message || 'Error al iniciar sesión');
   }
 };
+// =========================
+// 🔐 Login con correo y contraseña (flujo backend)
+// =========================
+
+interface LoginResponse {
+  message?: string;
+  sessionId?: string;
+  token?: string;
+  user?: any;
+}
+
+// Paso 1: Enviar email y password al backend (genera código y sesión)
+export const loginWithEmail = async (email: string, password: string): Promise<LoginResponse> => {
+  try {
+    const response = await axiosInstance.post<LoginResponse>(
+      '/api/public/security/login',
+      { email, password }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en login:', error);
+    throw new Error(error.response?.data?.message || 'Credenciales inválidas');
+  }
+};
+
+// Paso 2: Validar el código 2FA recibido por correo
+export const validate2FA = async (email: string, code2FA: string, sessionId: string): Promise<LoginResponse> => {
+  try {
+    const response = await axiosInstance.post<LoginResponse>(
+      '/api/public/security/validate2fa',
+      { email, code2FA, sessionId }
+    );
+
+    if (response.data.token) {
+      localStorage.setItem('jwtToken', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+
+    return response.data;
+  } catch (error: any) {
+    console.error('Error en validación 2FA:', error);
+    throw new Error(error.response?.data?.message || 'Código incorrecto o expirado');
+  }
+};
+
+
 
 export const logout = async (): Promise<void> => {
   if (!isClient) {

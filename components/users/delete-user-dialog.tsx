@@ -11,7 +11,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-import { User } from "@/services/userService"   // 👈 usa el mismo User de tu service
+import type { User } from "@/services/userService"
 
 interface DeleteUserDialogProps {
   user: User | null

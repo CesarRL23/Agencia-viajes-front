@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -12,6 +14,7 @@ import { Plus } from "lucide-react"
 export function CreateUserDialog() {
   const { refreshUsers } = useUsers()
   const [isLoading, setIsLoading] = useState(false)
+  const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -23,11 +26,9 @@ export function CreateUserDialog() {
     setIsLoading(true)
     try {
       await createUser(formData)
-      await refreshUsers() // Actualiza la lista de usuarios
-      setFormData({ name: "", email: "", password: "" }) // Limpia el formulario
-      // Cierra el diálogo
-      const closeButton = document.querySelector("[data-dialog-close]") as HTMLButtonElement
-      if (closeButton) closeButton.click()
+      await refreshUsers()
+      setFormData({ name: "", email: "", password: "" })
+      setOpen(false)
     } catch (error) {
       console.error("Error al crear usuario:", error)
     } finally {
@@ -36,7 +37,7 @@ export function CreateUserDialog() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           <Plus className="mr-2 h-4 w-4" />
@@ -80,7 +81,7 @@ export function CreateUserDialog() {
             </div>
           </div>
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" data-dialog-close>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>

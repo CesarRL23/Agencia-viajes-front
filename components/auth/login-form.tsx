@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, Mail, Lock, Chrome, Github } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import Link from "next/link"
-import { loginWithProvider } from "@/services/authService"
+import { loginWithProvider, loginWithEmail } from "@/services/authService"
 
 export function LoginForm() {
   const router = useRouter()
@@ -21,6 +21,7 @@ export function LoginForm() {
     password: "",
   })
 
+  // 🟢 Login con Google / GitHub / Microsoft (Firebase)
   const handleSocialLogin = async (provider: string) => {
     try {
       setIsLoading(true)
@@ -39,14 +40,12 @@ export function LoginForm() {
       router.replace("/dashboard")
     } catch (error: any) {
       console.error("Error de login:", error)
-
       toast({
         variant: "destructive",
         title: "Error al iniciar sesión",
         description: error.message || "Hubo un problema al intentar iniciar sesión",
         duration: 5000,
       })
-
       localStorage.removeItem("firebaseToken")
       localStorage.removeItem("user")
     } finally {
@@ -54,16 +53,32 @@ export function LoginForm() {
     }
   }
 
+  // 🧠 Login con correo y contraseña (flujo backend)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const res = await loginWithEmail(formData.email, formData.password)
+
+      if (res.sessionId) {
+        toast({
+          title: "Código enviado",
+          description: "Revisa tu correo y verifica el código de autenticación.",
+        })
+
+        // Redirigir a página de verificación 2FA
+        router.push(`/auth/verify-2fa?email=${formData.email}&sessionId=${res.sessionId}`)
+      }
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err.message || "Credenciales inválidas",
+      })
+    } finally {
       setIsLoading(false)
-      // Redirect to dashboard
-      window.location.href = "/dashboard"
-    }, 2000)
+    }
   }
 
   return (

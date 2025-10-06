@@ -4,29 +4,21 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserCheck, UserX, Shield } from "lucide-react"
 import { getUsers } from "@/services/userService"
-import type { User } from "@/services/userService"
 
 export function UsersStats() {
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
     inactive: 0,
-    admins: 0
+    admins: 0,
   })
 
   useEffect(() => {
     const loadStats = async () => {
       try {
         const users = await getUsers()
-        
-        setStats({
-          total: users.length,
-          active: users.filter(user => user.status === 'active').length || users.length, // asumiendo que todos son activos si no hay status
-          inactive: users.filter(user => user.status === 'inactive').length || 0,
-          admins: users.filter(user => user.role === 'admin').length || 0
-        })
       } catch (error) {
-        console.error('Error al cargar estadísticas:', error)
+        console.error("Error al cargar estadísticas:", error)
       }
     }
 
