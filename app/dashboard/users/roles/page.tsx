@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Select, SelectItem } from "@nextui-org/react";
+import { assignRole } from "@/services/roleService";
 
 interface User {
   _id: string;
@@ -41,17 +42,31 @@ export default function RolesPage() {
     fetchUsers();
   }, []);
 
-  const handleAssignRole = () => {
+  const handleAssignRole = async () => {
     if (!selectedUser || !selectedRole) return;
 
-    const user = users.find((u) => u._id === selectedUser);
-    if (!user) return;
+    try {
+      // Enviar al backend
+      await assignRole(selectedUser, selectedRole);
 
-    const newAssignment = { userName: user.name, role: selectedRole };
-    setAssignedRoles((prev) => [...prev, newAssignment]);
-    setSelectedUser("");
-    setSelectedRole("");
+      const user = users.find((u) => u._id === selectedUser);
+      if (!user) return;
+
+      // Mostrar en la tabla local (visual)
+      const newAssignment = { userName: user.name, role: selectedRole };
+      setAssignedRoles((prev) => [...prev, newAssignment]);
+
+      // Limpiar los selects
+      setSelectedUser("");
+      setSelectedRole("");
+
+      alert("✅ Rol asignado correctamente");
+    } catch (error) {
+      console.error("Error al asignar el rol:", error);
+      alert("❌ No se pudo asignar el rol");
+    }
   };
+
 
   return (
     <div className="p-6">
