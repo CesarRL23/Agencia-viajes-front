@@ -134,7 +134,7 @@ export default function RolesPage() {
           </svg>
           Gestión Completa de Roles
         </button>
-      </div>
+      </div>  
 
       <table className="w-full mt-6 border">
         <thead className="bg-gray-100">

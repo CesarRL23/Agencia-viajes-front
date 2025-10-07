@@ -24,6 +24,17 @@ githubProvider.addScope('user');
 githubProvider.addScope('user:email');
 githubProvider.addScope('read:user');
 const microsoftProvider = new OAuthProvider('microsoft.com');
+// Scopes recomendados para Microsoft (OpenID + Graph básico)
+microsoftProvider.addScope('openid');
+microsoftProvider.addScope('profile');
+microsoftProvider.addScope('email');
+microsoftProvider.addScope('User.Read');
+// Permite forzar selección de cuenta y configurar el tenant si se provee
+microsoftProvider.setCustomParameters({
+  prompt: 'select_account',
+  // Usa tu tenant si lo defines, caso contrario usa "common"
+  tenant: (process.env.NEXT_PUBLIC_MS_TENANT_ID as string) || 'common'
+});
 
 // Agregar scopes necesarios
 googleProvider.addScope('profile');
