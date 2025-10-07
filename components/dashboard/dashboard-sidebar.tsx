@@ -44,6 +44,11 @@ const navigation = [
     icon: Users,
   },
   {
+    name: "Roles y Permisos",
+    href: "/dashboard/role-permissions",
+    icon: MessageSquare,
+  },
+  {
     name: "Viajes",
     href: "/dashboard/trips",
     icon: Plane,
