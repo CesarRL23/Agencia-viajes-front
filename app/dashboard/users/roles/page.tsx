@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Select, SelectItem } from "@nextui-org/react";
-import { assignRole } from "@/services/roleService";
+import { assignRoleToUser } from "@/services/roleService";
+import { useRouter } from "next/navigation";
 
 interface User {
   _id: string;
@@ -15,6 +16,7 @@ interface Role {
 }
 
 export default function RolesPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<string>("");
@@ -48,7 +50,7 @@ export default function RolesPage() {
 
     try {
       // Enviar al backend
-      await assignRole(selectedUser, selectedRole);
+      await assignRoleToUser(selectedUser, selectedRole);
 
       const user = users.find((u) => u._id === selectedUser);
       if (!user) return;
@@ -66,6 +68,10 @@ export default function RolesPage() {
       console.error("Error al asignar el rol:", error);
       alert("❌ No se pudo asignar el rol");
     }
+  };
+
+  const handleGoToRolesManagement = () => {
+    router.push("/dashboard/roles");
   };
 
 
@@ -110,12 +116,25 @@ export default function RolesPage() {
 
       </div>
 
-      <button
-        onClick={handleAssignRole}
-        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-      >
-        Asignar Rol
-      </button>
+      <div className="flex gap-3">
+        <button
+          onClick={handleAssignRole}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Asignar Rol
+        </button>
+        
+        <button
+          onClick={handleGoToRolesManagement}
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Gestión Completa de Roles
+        </button>
+      </div>
 
       <table className="w-full mt-6 border">
         <thead className="bg-gray-100">
