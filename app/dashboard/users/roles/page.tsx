@@ -1,48 +1,55 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Select, SelectItem } from "@nextui-org/react";
-import { assignRoleToUser } from "@/services/roleService";
+import { assignRoleToUser, getRoles, getUsersByRole, getRolesByUser } from "@/services/roleService";
+import { getUsers } from "@/services/userService";
+import type { User as ServiceUser } from "@/services/userService";
+import type { Role as ServiceRole } from "@/services/roleService";
 import { useRouter } from "next/navigation";
 
-interface User {
-  _id: string;
-  name: string;
-  email: string;
-}
-
-interface Role {
-  id: string;
-  name: string;
-}
+type User = ServiceUser;
+type Role = ServiceRole;
 
 export default function RolesPage() {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [selectedRole, setSelectedRole] = useState<string>("");
+  const [roles, setRoles] = useState<Role[]>([]);
   const [assignedRoles, setAssignedRoles] = useState<
     { userName: string; role: string }[]
   >([]);
 
-  const roles: Role[] = [
-  { id: "68c32a54748c5b1db0d503bf", name: "Administrador" },
-  { id: "68e4344c08bd244ede55532d", name: "Cliente" },
-  { id: "68e4343b08bd244ede55532c", name: "Guía Turístico" },
-];
+  // Estados para búsquedas
+  const [nameQuery, setNameQuery] = useState<string>("");
+  const [roleSearchId, setRoleSearchId] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<{ userName: string; roleName: string }[]>([]);
 
 
   // ✅ Cargar los usuarios desde el backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await fetch("http://localhost:8080/api/users");
-        const data = await res.json();
+        const data = await getUsers();
         setUsers(data);
       } catch (error) {
         console.error("Error al cargar los usuarios:", error);
       }
     };
     fetchUsers();
+  }, []);
+
+  // ✅ Cargar roles desde el backend
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const data = await getRoles();
+        setRoles(data);
+      } catch (error) {
+        console.error("Error al cargar los roles:", error);
+      }
+    };
+    fetchRoles();
   }, []);
 
   const handleAssignRole = async () => {
@@ -56,7 +63,8 @@ export default function RolesPage() {
       if (!user) return;
 
       // Mostrar en la tabla local (visual)
-      const newAssignment = { userName: user.name, role: selectedRole };
+      const roleName = roles.find(r => r._id === selectedRole)?.name || selectedRole;
+      const newAssignment = { userName: user.name, role: roleName };
       setAssignedRoles((prev) => [...prev, newAssignment]);
 
       // Limpiar los selects
@@ -70,6 +78,51 @@ export default function RolesPage() {
     }
   };
 
+  // 🔎 Buscar usuarios por nombre (cliente llama endpoint de usuarios)
+  const handleSearchByName = async () => {
+    try {
+      const allUsers = await getUsers();
+      const matchingUsers = allUsers.filter(u => u.name?.toLowerCase().includes(nameQuery.trim().toLowerCase()));
+
+      // Para cada usuario, consultar sus roles y concatenar los nombres
+      const rows = await Promise.all(
+        matchingUsers.map(async (u) => {
+          try {
+            const userRoles = await getRolesByUser(u._id as string);
+            const roleNames = (userRoles || [])
+              .map((ur: any) => ur?.role?.name)
+              .filter(Boolean)
+              .join(", ");
+            return { userName: u.name, roleName: roleNames };
+          } catch {
+            return { userName: u.name, roleName: "" };
+          }
+        })
+      );
+
+      setSearchResults(rows);
+    } catch (error) {
+      console.error("Error en búsqueda por nombre:", error);
+      setSearchResults([]);
+    }
+  };
+
+  // 🔎 Buscar usuarios por rol (servidor: /api/user-role/role/{roleId})
+  const handleSearchByRole = async () => {
+    if (!roleSearchId) return;
+    try {
+      const list = await getUsersByRole(roleSearchId);
+      const rows = list.map((ur: any) => ({
+        userName: ur?.user?.name || "",
+        roleName: ur?.role?.name || roles.find(r => r._id === roleSearchId)?.name || "",
+      }));
+      setSearchResults(rows);
+    } catch (error) {
+      console.error("Error en búsqueda por rol:", error);
+      setSearchResults([]);
+    }
+  };
+
   const handleGoToRolesManagement = () => {
     router.push("/dashboard/roles");
   };
@@ -79,6 +132,53 @@ export default function RolesPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Gestión de Roles</h1>
+      </div>
+
+      {/* Buscadores */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Buscar por nombre */}
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">Buscar usuario por nombre</label>
+            <input
+              className="w-full border rounded px-3 py-2"
+              placeholder="Ej: Juan"
+              value={nameQuery}
+              onChange={(e) => setNameQuery(e.target.value)}
+            />
+          </div>
+          <button
+            onClick={handleSearchByName}
+            className="whitespace-nowrap bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+          >
+            Buscar usuario
+          </button>
+        </div>
+
+        {/* Buscar por rol */}
+        <div className="flex items-end gap-2 md:col-span-2">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">Buscar usuarios por rol</label>
+            <Select
+              label="Seleccionar Rol"
+              selectedKeys={roleSearchId ? [roleSearchId] : []}
+              onSelectionChange={(keys) => setRoleSearchId(Array.from(keys)[0] as string)}
+              classNames={{ popoverContent: "bg-white shadow-md" }}
+            >
+              {roles.map((role) => (
+                <SelectItem key={role._id} value={role._id}>
+                  {role.name}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+          <button
+            onClick={handleSearchByRole}
+            className="whitespace-nowrap bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+          >
+            Buscar por rol
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -108,7 +208,7 @@ export default function RolesPage() {
               }}
             >
               {roles.map((role) => (
-                <SelectItem key={role.id} value={role.id}>
+                <SelectItem key={role._id} value={role._id}>
                   {role.name}
                 </SelectItem>
               ))}
@@ -136,7 +236,9 @@ export default function RolesPage() {
         </button>
       </div>  
 
-      <table className="w-full mt-6 border">
+      {/* Resultados de búsqueda */}
+      <h2 className="text-lg font-semibold mt-8 mb-2">Resultados</h2>
+      <table className="w-full border">
         <thead className="bg-gray-100">
           <tr>
             <th className="border px-4 py-2 text-left">Usuario</th>
@@ -144,14 +246,18 @@ export default function RolesPage() {
           </tr>
         </thead>
         <tbody>
-          {assignedRoles.map((item, index) => (
+          {searchResults.map((item, index) => (
             <tr key={index}>
               <td className="border px-4 py-2">{item.userName}</td>
-              <td className="border px-4 py-2">{item.role}</td>
+              <td className="border px-4 py-2">{item.roleName}</td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {/* Tabla histórica local de asignaciones hechas en esta sesión */}
+  
+      
     </div>
   );
 }
